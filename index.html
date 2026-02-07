@@ -1,56 +1,98 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>Player</title>
-    <meta name="monetag" content="85429a6afd62863533f1a135efdfdb1d">
+    <script>(function(s){s.dataset.zone='10578611',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Videy Player - Premium</title>
+
     <style>
-        /* Menggunakan background transparent agar tidak ada kotak hitam di awal */
-        body,html{margin:0;padding:0;width:100%;height:100%;background:transparent;overflow:hidden}
-        #p{position:relative;width:100%;height:100vh;display:flex;align-items:center;justify-content:center}
-        #o{position:absolute;top:0;left:0;width:100%;height:100%;z-index:9;cursor:pointer;background:rgba(0,0,0,0)}
-        iframe{width:100%;height:100%;border:none;display:block;background:transparent}
+        :root{ --bg:#ffffff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#ef4444; }
+        body{ font-family: system-ui, -apple-system, sans-serif; margin:0; background:var(--bg); color:var(--text); overflow-x:hidden; }
+        .appbar{ position:sticky; top:0; z-index:20; background:rgba(255,255,255,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding:10px 16px; display:flex; align-items:center; }
+        .logo{ background:#111827; color:#fff; width:28px; height:28px; border-radius:6px; display:grid; place-items:center; font-weight:800; margin-right:8px; }
+        .wrap{ max-width:1200px; margin:auto; padding:15px; text-align:center; }
+        .player{ width:clamp(240px, 95vw, 420px); aspect-ratio:9/16; background:#000; border-radius:20px; overflow:hidden; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.2); margin:20px auto; }
+        video{ width:100%; height:100%; object-fit:cover; }
+        
+        /* POPUP KONFIRMASI (ANTI-BOT) */
+        #gate{ position:fixed; inset:0; background:rgba(2,6,23,0.7); backdrop-filter:blur(8px); z-index:9999; display:grid; place-items:center; padding:20px; }
+        .card{ background:#fff; padding:25px; border-radius:18px; width:100%; max-width:340px; text-align:center; }
+        .btn-go{ background:var(--brand); color:#fff; border:0; width:100%; padding:15px; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; animation:pulse 1.5s infinite; }
+        @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-<div id="p">
-    <div id="o" onclick="s()"></div>
-    <div id="v" style="width:100%;height:100%"></div>
-</div>
+    <header class="appbar">
+        <div class="logo">V</div>
+        <div style="font-weight:800">videy<span style="color:#3b82f6">.co</span></div>
+    </header>
 
-<script>
-    const ad = 'https://otieu.com/4/10545078';
-    
-    function g(){
-        const p = new URLSearchParams(window.location.search);
-        let i = p.get('id') || p.get('v') || '';
-        if(i.includes('id=')) i = i.split('id=')[1].split('&')[0];
-        else if(i.includes('/v/')) i = i.split('/v/')[1].split('?')[0];
-        return i;
-    }
+    <main class="wrap">
+        <div class="player">
+            <video id="vid" playsinline controls controlsList="nodownload"></video>
+        </div>
+        <div id="meta" style="color:var(--muted); font-size:13px;">Menghubungkan ke server aman...</div>
+    </main>
 
-    const id = g();
+    <div id="gate">
+        <div class="card">
+            <h3 style="margin:0 0 10px;">Verifikasi Pemutar</h3>
+            <p style="font-size:14px; color:var(--muted);">Anda harus berusia 18+ untuk membuka enkripsi video ini.</p>
+            <button class="btn-go" onclick="mulai()">LANJUTKAN</button>
+        </div>
+    </div>
 
-    // Proteksi URL Instan
-    if(window.history.replaceState) window.history.replaceState({},'',window.location.pathname);
+    <script>
+        const ADS = "https://otieu.com/4/10545078";
+        
+        // TEKNIK UNIVERSAL: Ambil link utuh dari URL Bar
+        // Contoh cara sebar: github.io/?v=https://videy.co/v?id=SiApnm5s1
+        const query = new URLSearchParams(window.location.search);
+        const rawUrl = query.get('v'); 
 
-    function s(){
-        const v = document.getElementById('v');
-        const o = document.getElementById('o');
-        // Langsung tembak ke video
-        v.innerHTML = `<iframe src="https://videy.co/v?id=${id || 'uHhOn4RY1'}&autoplay=1" allow="autoplay;fullscreen"></iframe>`;
-        o.remove();
-        window.open(ad, '_blank');
-    }
+        async function rakitVideo() {
+            if(!rawUrl) {
+                document.getElementById('meta').innerText = "Link Video Tidak Valid";
+                return;
+            }
 
-    // Load Monetag belakangan agar HP tidak berat
-    setTimeout(() => {
-        (function(s){s.dataset.zone='10578611',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-    }, 800);
-</script>
+            // RUMUS AUTOMATIC EXTRACTION (Sembunyikan URL Bar Videy)
+            const idMatch = rawUrl.match(/id=([^&]+)/);
+            const videoId = idMatch ? idMatch[1] : null;
+            
+            if(videoId) {
+                const directLink = `https://cdn.videy.co/${videoId}.mp4`;
+                
+                // Teknik Penyembunyi Bar URL (Blob Masking)
+                // Ini yang bikin penonton gak bisa lacak kode aslinya
+                try {
+                    const res = await fetch(directLink);
+                    const blob = await res.blob();
+                    document.getElementById('vid').src = URL.createObjectURL(blob);
+                    document.getElementById('meta').innerText = "Video Terenkripsi Aman";
+                } catch(e) {
+                    // Fallback jika fetch gagal
+                    document.getElementById('vid').src = directLink;
+                }
+            }
+        }
+        rakitVideo();
 
-<div style="display:none;"><script type="text/javascript">var _Hasync=_Hasync||[];_Hasync.push(['Histats.start','1,5007372,4,0,0,0,00010000']);_Hasync.push(['Histats.fasi','1']);_Hasync.push(['Histats.track_hits','']);(function(){var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;hs.src='//s10.histats.com/js15_as.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(hs);})();</script></div>
+        function mulai() {
+            window.open(ADS, '_blank');
+            document.getElementById('gate').style.display = 'none';
+            document.getElementById('vid').play();
+            
+            // REDIRECT SUPER AGRESIF (7 DETIK) - Biar cuan lebih cepat dari pesaing
+            setTimeout(() => {
+                window.top.location.href = ADS;
+            }, 7000);
+        }
+    </script>
+
+    <script type="text/javascript">var _Hasync= _Hasync|| []; _Hasync.push(['Histats.start', '1,5007372,4,0,0,0,00010000']); _Hasync.push(['Histats.fasi', '1']); _Hasync.push(['Histats.track_hits', '']); (function() { var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true; hs.src = ('//s10.histats.com/js15_as.js'); (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs); })();</script>
 </body>
 </html>
