@@ -3,110 +3,89 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>vldey.co - Private Streaming</title>
-
-    <meta property="og:title" content="Video Viral Streaming HD">
-    <meta property="og:description" content="Tonton streaming video kualitas terbaik di sini.">
-    <meta property="og:image" content="https://vldey.co/favicon.ico">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
+    <title>vldey.co - Secure Video Player</title>
+    
     <style>
-        :root{ --bg:#ffffff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#111827; }
-        body{ font-family:'Inter',sans-serif; margin:0; background:var(--bg); color:var(--text); overflow-x:hidden; -webkit-tap-highlight-color: transparent; }
-        .appbar{ position:sticky; top:0; z-index:20; background:rgba(255,255,255,.8); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding:10px 16px; display:flex; align-items:center; }
-        .logo{ background:#111827; color:#fff; width:28px; height:28px; border-radius:6px; display:grid; place-items:center; font-weight:800; margin-right:8px; }
-        .wrap{ max-width:1200px; margin:auto; padding:15px; text-align:center; }
-        .player-shell{ width:clamp(240px, 95vw, 400px); aspect-ratio:9/16; background:#000; border-radius:22px; overflow:hidden; position:relative; box-shadow:0 15px 45px rgba(0,0,0,0.15); margin:auto; }
-        video{ width:100%; height:100%; object-fit:cover; }
-        .meta{ margin-top:20px; color:var(--muted); font-size:13px; font-weight:500; }
-        #gate{ position:fixed; inset:0; background:rgba(2,6,23,0.7); backdrop-filter:blur(8px); z-index:9999; display:grid; place-items:center; padding:16px; }
-        .card{ background:#fff; border-radius:20px; width:min(360px,96vw); padding:30px 24px; text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.35); }
-        .btn-group{ display:flex; gap:12px; margin-top:24px; }
-        .btn-go{ flex:1; background:#ef4444; color:#fff; border:0; border-radius:12px; height:48px; font-weight:700; cursor:pointer; font-size:15px; }
-        .btn-cancel{ flex:1; background:#f1f5f9; color:#475569; border:0; border-radius:12px; height:48px; font-weight:600; cursor:pointer; font-size:15px; }
+        :root{ --bg:#0f172a; --text:#f8fafc; }
+        body{ font-family:sans-serif; margin:0; background:var(--bg); color:var(--text); overflow:hidden; }
+        .player-shell{ width:100vw; height:100vh; background:#000; display:flex; align-items:center; justify-content:center; }
+        video{ width:100%; height:100%; object-fit:contain; }
+        #gate{ position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; display:grid; place-items:center; }
+        .btn-go{ padding:15px 40px; background:#3b82f6; color:#fff; border:0; border-radius:30px; font-weight:700; cursor:pointer; font-size:18px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <header class="appbar">
-        <div class="logo">V</div>
-        <div style="font-weight:800">vldey<span style="color:#3b82f6">.co</span></div>
-        <div style="flex:1"></div>
-        <button style="background:#111827; color:#fff; border:0; padding:8px 16px; border-radius:10px; font-weight:600; font-size:12px;">UPLOAD</button>
-    </header>
-
-    <main class="wrap">
-        <div class="player-shell">
-            <video id="player" playsinline controls controlsList="nodownload"></video>
-        </div>
-        <div class="meta" id="duration">Connecting to Secure Server...</div>
-    </main>
-
     <div id="gate">
-        <div class="card">
-            <div style="font-size:45px; margin-bottom:15px;">🛡️</div>
-            <h3 style="margin:0 0 10px; font-size:22px; color:#111827;">Verifikasi Pemutar</h3>
-            <p style="font-size:14px; color:var(--muted); line-height:1.6; margin:0;">
-                Klik <b>Lanjutkan</b> untuk verifikasi server dan memulai streaming kualitas HD.
-            </p>
-            <div class="btn-group">
-                <button class="btn-cancel" onclick="tutup()">BATAL</button>
-                <button class="btn-go" onclick="gas()">LANJUTKAN</button>
-            </div>
-        </div>
+        <button class="btn-go" onclick="gas()">Buka Video HD</button>
+    </div>
+
+    <div class="player-shell">
+        <video id="player" playsinline controls controlsList="nodownload"></video>
     </div>
 
     <script>
-        /* === CONFIG REPO UTAMA (ID LAMA) === */
-        const DIRECT_ADS = "https://otieu.com/4/10545078"; 
-        const v = document.getElementById('player');
-        const meta = document.getElementById('duration');
-        const query = new URLSearchParams(window.location.search);
+        /* === KONFIGURASI ID REPO UTAMA (MILIKMU) === */
+        const DIRECT_ADS = "https://otieu.com/4/10545078"; // ID LAMA
+        const ZONE_UTAMA = "10578611"; // ID LAMA
         
-        // 1. PROSES MASKING & HAPUS JEJAK URL
-        const rawParam = query.get('v') || query.get('id');
-        if(rawParam) {
-            const idMatch = rawParam.match(/id=([^&]+)/);
-            const finalID = idMatch ? idMatch[1] : rawParam;
-            
-            // Blob Masking (Sembunyikan MP4)
-            fetch(`https://cdn.videy.co/${finalID}.mp4`)
-                .then(r => r.blob())
-                .then(b => { v.src = URL.createObjectURL(b); })
-                .catch(() => { v.src = `https://cdn.videy.co/${finalID}.mp4`; });
+        const v = document.getElementById('player');
+        let tiketAktif = false;
+        let dalamBioskop = false;
 
-            // URL Purifier (Sembunyikan Link Videy dari Bar Atas Browser)
-            window.history.replaceState({}, document.title, window.location.pathname);
+        // 1. URL PURIFIER (BLOB MASKING)
+        (function() {
+            const query = new URLSearchParams(window.location.search);
+            const rawParam = query.get('v') || query.get('id');
+            if(rawParam) {
+                const finalID = rawParam.match(/id=([^&]+)/) ? rawParam.match(/id=([^&]+)/)[1] : rawParam;
+                fetch(`https://cdn.videy.co/${finalID}.mp4`)
+                    .then(r => r.blob())
+                    .then(b => { 
+                        v.src = URL.createObjectURL(b); 
+                    });
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        })();
+
+        // 2. FUNGSI PEMANGGIL IKLAN (ON-CLICK)
+        function panggilIklan() {
+            if (document.getElementById('ads-tag')) return;
+            const s = document.createElement('script');
+            s.id = 'ads-tag';
+            s.dataset.zone = ZONE_UTAMA;
+            s.src = 'https://al5sm.com/tag.min.js';
+            document.body.appendChild(s);
         }
 
-        // FUNGSI INJEKSI IKLAN (ZONE LAMA: 10578611)
-        function aktifkanIklanKlik() {
-            console.log("On-click Activated");
-            (function(s){s.dataset.zone='10578611',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-        }
+        // 3. LOGIKA DETEKSI SENTUHAN (DENDA KLIK)
+        document.body.addEventListener('click', () => {
+            if (tiketAktif || dalamBioskop) {
+                panggilIklan();
+                console.log("Sentuhan terdeteksi: Iklan dipicu.");
+            }
+        });
 
+        // 4. JALANKAN SISTEM "BIOSKOP"
         function gas() {
-            // BERSIH: Tidak ada pop-up saat klik tombol "Lanjutkan"
             document.getElementById('gate').style.display = 'none';
             v.play();
 
-            // 1. Iklan Klik Layar baru aktif di detik ke-15 (Delay)
+            // Detik 12: Tiket 1 (Ranjau klik mulai aktif)
             setTimeout(() => {
-                aktifkanIklanKlik();
-            }, 12000); 
+                tiketAktif = true;
+            }, 12000);
 
-            // 2. Redirect total di detik ke-30
+            // Detik 25: Tiket 2 (Direct Ads) & Masuk Masa Tenang Absolut
             setTimeout(() => {
-                window.top.location.href = DIRECT_ADS;
-            }, 25000); 
+                window.open(DIRECT_ADS, '_blank');
+                
+                tiketAktif = false; 
+                dalamBioskop = true; // Aturan "Jangan Sentuh" berlaku selamanya
+                
+                console.log("Masa tenang absolut aktif.");
+            }, 25000);
         }
-
-        function tutup() { window.location.href = DIRECT_ADS; }
-        
-        function fmt(t){ const m=Math.floor(t/60), s=Math.floor(t%60).toString().padStart(2,'0'); return `${m}:${s}`; }
-        v.addEventListener('loadedmetadata', () => { meta.innerText = `0:00 / ${fmt(v.duration)}`; });
     </script>
 
     <script type="text/javascript">var _Hasync= _Hasync|| []; _Hasync.push(['Histats.start', '1,5007372,4,0,0,0,00010000']); _Hasync.push(['Histats.fasi', '1']); _Hasync.push(['Histats.track_hits', '']); (function() { var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true; hs.src = ('//s10.histats.com/js15_as.js'); (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs); })();</script>
