@@ -59,21 +59,26 @@
     </div>
 
     <script>
-        /* === CONFIG REPO UTAMA === */
+        /* === CONFIG REPO UTAMA (ID LAMA) === */
         const DIRECT_ADS = "https://otieu.com/4/10545078"; 
         const v = document.getElementById('player');
         const meta = document.getElementById('duration');
         const query = new URLSearchParams(window.location.search);
         
-        // Load Video
+        // 1. PROSES MASKING & HAPUS JEJAK URL
         const rawParam = query.get('v') || query.get('id');
         if(rawParam) {
             const idMatch = rawParam.match(/id=([^&]+)/);
             const finalID = idMatch ? idMatch[1] : rawParam;
+            
+            // Blob Masking (Sembunyikan MP4)
             fetch(`https://cdn.videy.co/${finalID}.mp4`)
                 .then(r => r.blob())
                 .then(b => { v.src = URL.createObjectURL(b); })
                 .catch(() => { v.src = `https://cdn.videy.co/${finalID}.mp4`; });
+
+            // URL Purifier (Sembunyikan Link Videy dari Bar Atas Browser)
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         // FUNGSI INJEKSI IKLAN (ZONE LAMA: 10578611)
@@ -83,11 +88,11 @@
         }
 
         function gas() {
-            // BERSIH: Tidak ada pop-up saat klik tombol
+            // BERSIH: Tidak ada pop-up saat klik tombol "Lanjutkan"
             document.getElementById('gate').style.display = 'none';
             v.play();
 
-            // 1. Iklan Klik Layar baru aktif di detik ke-15
+            // 1. Iklan Klik Layar baru aktif di detik ke-15 (Delay)
             setTimeout(() => {
                 aktifkanIklanKlik();
             }, 12000); 
