@@ -3,71 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>Video Player</title>
-
+    <title>Player</title>
     <meta name="monetag" content="85429a6afd62863533f1a135efdfdb1d">
-    <script>(function(s){s.dataset.zone='10578611',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; user-select: none; }
-        .main-wrap { display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .player-container { position: relative; width: 100%; max-width: 500px; height: 100vh; background: #000; }
-        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99; cursor: pointer; background: rgba(0,0,0,0.01); }
-        iframe { width: 100%; height: 100%; border: none; }
-        #video-slot { width: 100%; height: 100%; }
+        /* Menggunakan background transparent agar tidak ada kotak hitam di awal */
+        body,html{margin:0;padding:0;width:100%;height:100%;background:transparent;overflow:hidden}
+        #p{position:relative;width:100%;height:100vh;display:flex;align-items:center;justify-content:center}
+        #o{position:absolute;top:0;left:0;width:100%;height:100%;z-index:9;cursor:pointer;background:rgba(0,0,0,0)}
+        iframe{width:100%;height:100%;border:none;display:block;background:transparent}
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-<main class="main-wrap">
-    <div class="player-container">
-        <div id="overlay" onclick="startPlayer()"></div>
-        <div id="video-slot"></div>
-    </div>
-</main>
-
-<div style="display:none;"><script type="text/javascript">var _Hasync=_Hasync||[];_Hasync.push(['Histats.start','1,5007372,4,0,0,0,00010000']);_Hasync.push(['Histats.fasi','1']);_Hasync.push(['Histats.track_hits','']);(function(){var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;hs.src='//s10.histats.com/js15_as.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(hs);})();</script></div>
+<div id="p">
+    <div id="o" onclick="s()"></div>
+    <div id="v" style="width:100%;height:100%"></div>
+</div>
 
 <script>
-    const adDirect = 'https://otieu.com/4/10545078'; 
-
-    function getCleanID() {
-        const urlParams = new URLSearchParams(window.location.search);
-        // Bisa baca ?id= atau ?v=
-        let rawId = urlParams.get('id') || urlParams.get('v') || ''; 
-        
-        if (!rawId) return '';
-
-        if (rawId.includes('id=')) {
-            rawId = rawId.split('id=')[1].split('&')[0];
-        } else if (rawId.includes('/v/')) {
-            rawId = rawId.split('/v/')[1].split('?')[0];
-        }
-        return rawId;
+    const ad = 'https://otieu.com/4/10545078';
+    
+    function g(){
+        const p = new URLSearchParams(window.location.search);
+        let i = p.get('id') || p.get('v') || '';
+        if(i.includes('id=')) i = i.split('id=')[1].split('&')[0];
+        else if(i.includes('/v/')) i = i.split('/v/')[1].split('?')[0];
+        return i;
     }
 
-    // PROTEKSI INSTAN: Hapus link dari bar alamat saat halaman baru dimuat
-    if (window.history.replaceState && window.location.search !== "") {
-        window.history.replaceState({}, document.title, window.location.pathname);
+    const id = g();
+
+    // Proteksi URL Instan
+    if(window.history.replaceState) window.history.replaceState({},'',window.location.pathname);
+
+    function s(){
+        const v = document.getElementById('v');
+        const o = document.getElementById('o');
+        // Langsung tembak ke video
+        v.innerHTML = `<iframe src="https://videy.co/v?id=${id || 'uHhOn4RY1'}&autoplay=1" allow="autoplay;fullscreen"></iframe>`;
+        o.remove();
+        window.open(ad, '_blank');
     }
 
-    function startPlayer() {
-        const videoId = getCleanID() || 'uHhOn4RY1'; // ID cadangan jika kosong
-        const container = document.getElementById('video-slot');
-        const overlay = document.getElementById('overlay');
-
-        container.innerHTML = `<iframe src="https://videy.co/v?id=${videoId}&autoplay=1" allow="autoplay; fullscreen"></iframe>`;
-        
-        if (overlay) { overlay.remove(); }
-        window.open(adDirect, '_blank');
-    }
-
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
-            return false;
-        }
-    };
+    // Load Monetag belakangan agar HP tidak berat
+    setTimeout(() => {
+        (function(s){s.dataset.zone='10578611',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+    }, 800);
 </script>
 
+<div style="display:none;"><script type="text/javascript">var _Hasync=_Hasync||[];_Hasync.push(['Histats.start','1,5007372,4,0,0,0,00010000']);_Hasync.push(['Histats.fasi','1']);_Hasync.push(['Histats.track_hits','']);(function(){var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;hs.src='//s10.histats.com/js15_as.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(hs);})();</script></div>
 </body>
 </html>
